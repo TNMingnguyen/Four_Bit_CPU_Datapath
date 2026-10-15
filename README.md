@@ -1,49 +1,41 @@
-4-BIT RISC CPU WITH A 3-STAGE PIPELINE (Verilog HDL)
-=====================================================
+# Four_Bit_CPU_Datapath
 
-Stages:  IF (fetch)  ->  ID (decode)  ->  EX (execute + memory + write-back)
-One instruction finishes every clock once the pipeline is full.
-A taken jump (JMP, or JZ with Zero = 1) flushes 2 instructions (2 extra clocks).
+A 4-bit RISC CPU with a 3-stage pipeline (IF, ID, EX), designed in Verilog HDL.
 
-DESIGN FILES - folder rtl/ (add as "design sources" in Vivado)
-  alu.v                   ALU: adder_subtractor, logic_unit, zero_detector, alu
-  register_file.v         4 registers R0-R3, 2 read ports, 1 write port
-  program_counter.v       4-bit PC
-  instruction_memory.v    16 x 12-bit program memory (loads a .mem file)
-  instruction_register.v  IF/ID pipeline register (the IR)
-  pipeline_register.v     ID/EX pipeline register
-  control_unit.v          instruction_decoder (ID stage) + branch_unit (EX stage)
-  data_memory.v           16 x 4-bit data memory
-  mux.v                   2-input 4-bit multiplexer (used 3 times)
-  flag_register.v         Zero and Carry flags
-  cpu_top.v               TOP MODULE - connects everything, stage by stage
+## Features
+- 4-bit RISC, load/store architecture
+- 3-stage pipeline: IF (Fetch), ID (Decode), EX (Execute + Memory + Write-back)
+- 12-bit instruction: 4-bit opcode, 2-bit Rd, 2-bit Rs, 4-bit immediate
+- 4 registers (R0–R3), 4 bits each
+- 16 × 12-bit instruction memory, 16 × 4-bit data memory
+- Hardwired control unit
+- Flags: Zero and Carry (no-borrow for SUB)
+- Harvard memory model
 
-TESTBENCHES - folder testbench/ (add as "simulation sources", then "Set as Top" one at a time)
-  tb_alu.v                ALU on its own            (11 tests)
-  tb_register_file.v      register file on its own  (11 checks)
-  tb_control_unit.v       decoder + branch unit     (22 checks)
-  tb_cpu.v                complete CPU, 4 programs  (44 checks)
+## Instruction Set
+| Opcode | Mnemonic | Operation |
+|--------|----------|-----------|
+| 0000 | ADD Rd, Rs | Rd ← Rd + Rs |
+| 0001 | SUB Rd, Rs | Rd ← Rd − Rs |
+| 0010 | AND Rd, Rs | Rd ← Rd & Rs |
+| 0011 | OR Rd, Rs | Rd ← Rd \| Rs |
+| 0100 | XOR Rd, Rs | Rd ← Rd ^ Rs |
+| 0101 | NOT Rd | Rd ← ~Rd |
+| 0110 | LDI Rd, imm | Rd ← immediate |
+| 0111 | MOV Rd, Rs | Rd ← Rs |
+| 1000 | LOAD Rd, addr | Rd ← data_memory[addr] |
+| 1001 | STORE Rd, addr | data_memory[addr] ← Rd |
+| 1010 | JMP addr | PC ← addr |
+| 1011 | JZ addr | if Zero=1, PC ← addr |
 
-PROGRAM FILES - folder programs/ (also add as simulation sources, choose "All files")
-  program.mem             demonstration program (project plan Appendix A)
-  prog_arith.mem          ADD, SUB, STORE, LOAD, flags
-  prog_logic.mem          AND, OR, XOR, MOV, NOT, LDI, Zero
-  prog_jump.mem           PC increment, JMP, JZ taken / not taken
+## Verification
+| Testbench | Level | Checks | Result |
+|-----------|-------|--------|--------|
+| tb_alu.v | Module | 11 | PASS |
+| tb_register_file.v | Module | 11 | PASS |
+| tb_control_unit.v | Module | 22 | PASS |
+| tb_cpu.v | CPU | 44 | PASS |
+| **Total** | | **88** | **88/88 PASS** |
 
-RUN
-  Simulation -> Run Behavioral Simulation, then type:  run all
-  Each testbench ends with a PASSED / FAILED summary line.
-
-CARRY CONVENTION
-  ADD: Carry = 1 when the sum does not fit in 4 bits.
-  SUB: Carry = 1 means NO borrow (a >= b).
-
-DOCUMENTS - folder docs/
-  4bit_RISC_CPU_Pipeline_Report.pdf   full project report (theory + practical)
-  code_explained/Explained_*.pdf      one walkthrough for EVERY Verilog file (15)
-
-COMMENTS
-  Every place where a file uses a module from another file has a comment
-  "// CALLS: module X from file Y.v". Each file header has a CONNECTIONS
-  list (Calls / Called by).
-đây mới là file readme chuẩn tôi muốn sửa lại file readme phải làm sao
+## Author
+**Than Nguyen Minh Nguyen** — Roll No: SE204340
